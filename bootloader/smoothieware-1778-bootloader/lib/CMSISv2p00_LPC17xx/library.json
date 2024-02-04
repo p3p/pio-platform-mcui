@@ -1,0 +1,25 @@
+{
+  "name": "CMSIS_LPC17xx",
+  "version": "2.0.0",
+  "description": "CMSISv200_LPC17xx",
+  "keywords": "cmsis",
+  "repository":
+  {
+  },
+  "authors":
+  [
+    {
+      "name": "lpcnxp"
+    }
+  ],
+  "license": "",
+  "homepage": "",
+  "dependencies": {
+  },
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "srcDir": "src",
+    "includeDir": "inc"
+  }
+}

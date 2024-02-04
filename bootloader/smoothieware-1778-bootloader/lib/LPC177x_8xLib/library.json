@@ -1,0 +1,25 @@
+{
+  "name": "LPC177x_8xLib",
+  "version": "1.0.0",
+  "description": "LPC177x_8xLib",
+  "keywords": "LPC177x_8xLib",
+  "repository":
+  {
+  },
+  "authors":
+  [
+    {
+      "name": "lpcnxp"
+    }
+  ],
+  "license": "",
+  "homepage": "",
+  "dependencies": {
+  },
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "srcDir": "src",
+    "includeDir": "inc"
+  }
+}

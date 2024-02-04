@@ -1,0 +1,50 @@
+{
+  "build": {
+    "cpu": "cortex-m4",
+    "f_cpu": "120000000L",
+    "mcu": "lpc4078",
+    "core": "arduino",
+    "variant": "lpc4078"
+  },
+  "feature": {
+    "fpu": true
+  },
+  "connectivity": [
+  ],
+  "debug": {
+    "jlink_device": "LPC4078",
+    "svd_path": "LPC408x_7x.svd",
+    "tools": {
+      "cmsis-dap": {
+        "onboard": true,
+        "server": {
+          "arguments": [
+            "pyocd-gdbserver.py",
+            "-t",
+            "lpc4078"
+          ],
+          "executable": "$PYTHONEXE",
+          "package": "tool-pyocd"
+        }
+      }
+    }
+  },
+  "frameworks": [
+    "arduino"
+  ],
+  "name": "NXP LPC4078",
+  "upload": {
+    "offset_address": 16384,
+    "maximum_ram_size": 65504,
+    "maximum_size": 507904,
+    "protocol": "mbed",
+    "protocols": [
+      "jlink",
+      "blackmagic",
+      "cmsis-dap",
+      "mbed"
+    ]
+  },
+  "url": "https://www.nxp.com/docs/en/data-sheet/LPC408X_7X.pdf",
+  "vendor": "NXP"
+}
