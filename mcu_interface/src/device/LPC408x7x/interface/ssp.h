@@ -257,6 +257,23 @@ static constexpr FrequencyDescriptor find_divisors(const size_t frequency) {
   ssp.CR1.SSE = 1; // enable the device on the bus
 }
 
+[[gnu::always_inline]] static inline void configure(const size_t ssp_id, const Config config) {
+  auto& ssp = *ssp_device[ssp_id];
+
+  ssp.CR1.SSE = 0; // disable the device on the bus
+
+  ssp.CR0.CPHA = config.mode.phase;
+  ssp.CR0.CPOL = config.mode.polarity;
+  ssp.CR0.FRF = static_cast<uint8_t>(config.format);
+  ssp.CR0.DSS = (config.data_bits - 1) & 0xF;
+
+  frequency(ssp_id, config.frequency);
+
+  ssp.CR1.MS = 0;  // assume master mode atm
+
+  ssp.CR1.SSE = 1; // enable the device on the bus
+}
+
 [[gnu::always_inline]] static inline size_t rx_available(const size_t ssp_id) {
   auto& ssp = *ssp_device[ssp_id];
   return ssp.SR.RNE;
