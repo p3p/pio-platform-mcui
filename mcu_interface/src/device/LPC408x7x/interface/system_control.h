@@ -7,7 +7,7 @@
 #include <utility/bit_manipulation.h>
 
 typedef void(*VECTOR_TABLE_Type)(void);
-extern "C" const VECTOR_TABLE_Type __Vectors[240];
+extern "C" volatile const VECTOR_TABLE_Type __Vectors[64];
 extern "C" uint32_t SystemCoreClock;
 extern "C" uint32_t PeripheralClock;
 extern "C" uint32_t EMCClock;

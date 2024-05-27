@@ -167,7 +167,18 @@ env.Append(
 
 platform_path = Path(platform.manifest_path).parents[0]
 
+is_bootloader = False
 device_link_script = join(platform_path, "mcu_interface", "src", "device", mcu_interface_name, "build", "gcc_arm.ld")
+
+try:
+    if board.get("build.is_bootloader") == "yes":
+        board.update("upload.maximum_size", "16384")
+        board.update("upload.offset_address", "0")
+        device_link_script = join(platform_path, "mcu_interface", "src", "device", mcu_interface_name, "build", "gcc_arm_bootloader.ld")
+        is_bootloader = True
+except:
+  pass
+
 if env.get("LDSCRIPT_PATH") == None:
     env.Replace(LDSCRIPT_PATH=device_link_script)
 

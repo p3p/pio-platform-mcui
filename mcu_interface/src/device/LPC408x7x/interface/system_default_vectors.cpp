@@ -1,5 +1,52 @@
 #include <cstdint>
 
+namespace MCUI::config {
+  enum ConfigValue : uint64_t {
+    Disabled,
+    Enabled
+  };
+  inline constexpr ConfigValue systick = Enabled;
+  inline constexpr ConfigValue adc = Enabled;
+  inline constexpr ConfigValue eeprom = Enabled;
+  inline constexpr ConfigValue watchdog = Enabled;
+  inline constexpr ConfigValue usb = Enabled;
+  inline constexpr ConfigValue can = Enabled;
+  inline constexpr ConfigValue rtc = Enabled;
+  inline constexpr ConfigValue mcpwm = Enabled;
+  inline constexpr ConfigValue ethernet = Enabled;
+  inline constexpr ConfigValue usart[] = {
+    Enabled,
+    Enabled,
+    Enabled,
+    Enabled,
+    Enabled
+  };
+  inline constexpr ConfigValue timer[] = {
+    Enabled,
+    Enabled,
+    Enabled,
+    Enabled
+  };
+  inline constexpr ConfigValue ssp[] = {
+    Enabled,
+    Enabled,
+    Enabled
+  };
+  inline constexpr ConfigValue pwm[] = {
+    Enabled,
+    Enabled
+  };
+  inline constexpr ConfigValue i2c[] = {
+    Enabled,
+    Enabled,
+    Enabled
+  };
+  template <ConfigValue V, typename T> inline constexpr T value_if_enabled(T&& value, T&& or_value) {
+    if constexpr (V == ConfigValue::Enabled) return value;
+    else return or_value;
+  }
+}
+
 [[gnu::section(".noinit")]] uint32_t SystemCoreClock = 0;
 [[gnu::section(".noinit")]] uint32_t PeripheralClock = 0;
 [[gnu::section(".noinit")]] uint32_t EMCClock = 0;
@@ -83,50 +130,50 @@ extern "C" {
     DebugMon_Handler,                         /*  -4 Debug Monitor Handler */
     Reserved_Handler,                         /*     Reserved */
     PendSV_Handler,                           /*  -2 PendSV Handler */
-    SysTick_Handler,                          /*  -1 SysTick Handler */
+    MCUI::config::value_if_enabled<MCUI::config::systick>(SysTick_Handler, Default_Handler),  /*  -1 SysTick Handler */
 
     /* Interrupts */
-    WDT_IRQHandler,
-    TIMER0_IRQHandler,
-    TIMER1_IRQHandler,
-    TIMER2_IRQHandler,
-    TIMER3_IRQHandler,
-    UART0_IRQHandler,
-    UART1_IRQHandler,
-    UART2_IRQHandler,
-    UART3_IRQHandler,
-    PWM1_IRQHandler,
-    I2C0_IRQHandler,
-    I2C1_IRQHandler,
-    I2C2_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::watchdog>(WDT_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::timer[0]>(TIMER0_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::timer[1]>(TIMER1_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::timer[2]>(TIMER2_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::timer[3]>(TIMER3_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::usart[0]>(UART0_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::usart[1]>(UART1_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::usart[2]>(UART2_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::usart[3]>(UART3_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::pwm[1]>(PWM1_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::i2c[0]>(I2C0_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::i2c[1]>(I2C1_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::i2c[2]>(I2C2_IRQHandler,  Default_Handler),
     0,
-    SSP0_IRQHandler,
-    SSP1_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::ssp[0]>(SSP0_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::ssp[1]>(SSP1_IRQHandler, Default_Handler),
     PLL0_IRQHandler,
-    RTC_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::rtc>(RTC_IRQHandler, Default_Handler),
     EINT0_IRQHandler,
     EINT1_IRQHandler,
     EINT2_IRQHandler,
     EINT3_IRQHandler,
-    ADC_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::adc>(ADC_IRQHandler,  Default_Handler),
     BOD_IRQHandler,
-    USB_IRQHandler,
-    CAN_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::usb>(USB_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::can>(CAN_IRQHandler,  Default_Handler),
     DMA_IRQHandler,
     I2S_IRQHandler,
-    ENET_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::ethernet>(ENET_IRQHandler, Default_Handler),
     MCI_IRQHandler,
-    MCPWM_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::mcpwm>(MCPWM_IRQHandler,  Default_Handler),
     QEI_IRQHandler,
     PLL1_IRQHandler,
-    USBActivity_IRQHandler,
-    CANActivity_IRQHandler,
-    UART4_IRQHandler,
-    SSP2_IRQHandler,
+    MCUI::config::value_if_enabled<MCUI::config::usb>(USBActivity_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::can>(CANActivity_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::usart[3]>(UART4_IRQHandler,  Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::ssp[2]>(SSP2_IRQHandler, Default_Handler),
     LCD_IRQHandler,
     GPIO_IRQHandler,
-    PWM0_IRQHandler,
-    EEPROM_IRQHandler
+    MCUI::config::value_if_enabled<MCUI::config::pwm[0]>(PWM0_IRQHandler, Default_Handler),
+    MCUI::config::value_if_enabled<MCUI::config::eeprom>(EEPROM_IRQHandler, Default_Handler)
   };
 
   [[gnu::weak]] void Reserved_Handler() {

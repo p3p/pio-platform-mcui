@@ -31,6 +31,16 @@ using namespace MCUI::util::registers;
   __asm__ volatile ("nop");
 }
 
+[[gnu::always_inline, nodiscard]] static inline uint32_t MSP() {
+  uint32_t result;
+  asm volatile ("MRS %0, msp" : "=r" (result) );
+  return result;
+}
+
+[[gnu::always_inline]] static inline void MSP(uint32_t top_of_stack) {
+  asm volatile ("MSR msp, %0" : : "r" (top_of_stack) : "memory");
+}
+
 struct SystemControlBlock {
   uint32_t CPUID;         // 0x000, RO, CPUID Base Register
   uint32_t ICSR;          // 0x004, RW, Interrupt Control and State Register

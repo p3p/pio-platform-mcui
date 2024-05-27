@@ -246,8 +246,8 @@ struct pin_type {
   [[gnu::always_inline]] constexpr uint32_t gpio_address() const {
     return reg_gpio_base + sizeof(gpio_block) * gpio_reg_id;
   }
-  [[gnu::always_inline]] inline gpio_block& gpio_reg() const {
-    return *reinterpret_cast<gpio_block*>(gpio_address());
+  [[gnu::always_inline]] inline volatile gpio_block& gpio_reg() const {
+    return *reinterpret_cast<volatile gpio_block*>(gpio_address());
   }
   [[gnu::always_inline]] inline void toggle() {
     gpio_reg().reg_control ^= gpio_mask();
@@ -306,8 +306,8 @@ struct pin_type {
     return reg_function_base + (sizeof(uint32_t) * function_reg_id());
   }
   template <typename iocon_t>
-  [[gnu::always_inline]] inline iocon_t& function_reg() const {
-    return *reinterpret_cast<iocon_t*>(function_address());
+  [[gnu::always_inline]] inline volatile iocon_t& function_reg() const {
+    return *reinterpret_cast<volatile iocon_t*>(function_address());
   }
   [[gnu::always_inline]] inline void function(const uint8_t func) {
     function_reg<iocon_type_digital>().function = func;
