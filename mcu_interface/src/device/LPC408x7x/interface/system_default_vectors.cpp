@@ -1,5 +1,9 @@
 #include <cstdint>
 
+#ifndef LPC_USB_STACK_ENABLED
+  #define LPC_USB_STACK_ENABLED Enabled
+#endif
+
 namespace MCUI::config {
   enum ConfigValue : uint64_t {
     Disabled,
@@ -9,7 +13,7 @@ namespace MCUI::config {
   inline constexpr ConfigValue adc = Enabled;
   inline constexpr ConfigValue eeprom = Enabled;
   inline constexpr ConfigValue watchdog = Enabled;
-  inline constexpr ConfigValue usb = Enabled;
+  inline constexpr ConfigValue usb = LPC_USB_STACK_ENABLED;
   inline constexpr ConfigValue can = Enabled;
   inline constexpr ConfigValue rtc = Enabled;
   inline constexpr ConfigValue mcpwm = Enabled;

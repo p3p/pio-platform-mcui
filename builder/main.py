@@ -176,6 +176,9 @@ try:
         board.update("upload.offset_address", "0")
         device_link_script = join(platform_path, "mcu_interface", "src", "device", mcu_interface_name, "build", "gcc_arm_bootloader.ld")
         is_bootloader = True
+        env.Append(
+            CPPDEFINES= ["LPC_USB_STACK_ENABLED=Disabled"]
+        )
 except:
   pass
 
