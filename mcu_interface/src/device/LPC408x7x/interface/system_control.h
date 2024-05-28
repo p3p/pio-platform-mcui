@@ -15,6 +15,10 @@ extern "C" uint32_t USBClock;
 
 namespace LPC4078 {
 
+inline uint32_t system_clock() { return SystemCoreClock; }
+inline uint32_t peripheral_clock() { return PeripheralClock; }
+inline uint32_t usb_clock() { return USBClock; }
+
 constexpr inline uint32_t irq_to_vector_table_index(IRQNumber irq) {
   return MCUI::util::to_integral(irq) + 16;
 }
