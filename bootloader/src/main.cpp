@@ -143,6 +143,7 @@ int main() {
   Serial0.write(part_id.name);
   Serial0.write("]\n");
 
+  char buffer[16];
   auto serial_number = MCUI::IAP::device_serial_number();
   if (serial_number.status == MCUI::IAP::StatusCode::Success) {
     Serial0.write("boot: device serial [");
@@ -173,8 +174,16 @@ int main() {
       Serial0.write(board_firmware_cur);
       Serial0.write("\n");
     }
+  } else if (fr == FR_NOT_READY) {
+    Serial0.write("boot: no sd card\n");
+  } else if (fr == FR_NO_FILE) {
+    Serial0.write("boot: no new firmware\n");
+  } else {
+    Serial0.write("boot: error checking sdcard (error code: ");
+    auto res = std::to_chars(std::begin(buffer), std::end(buffer), fr);
+    Serial0.write(buffer, res.ptr - buffer);
+    Serial0.write(")\n");
   }
-
   f_unmount("");
 
   boot();
