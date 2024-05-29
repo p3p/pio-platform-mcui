@@ -22,6 +22,7 @@ constexpr uint32_t board_uart_baud = 115200;
 const char* board_firmware_bin = "firmware.bin";
 const char* board_firmware_cur = "firmware.cur";
 constexpr const std::array<pin_state_t, 13> board_safe_pin_states { pin_state_t{P1_02}, {P1_10}, {P4_30}, {P1_09}, {P4_23}, {P3_08}, {P3_00}, {P3_27}, {P5_04}, {P1_08}, {P4_31}, {P3_01}, {P3_10} };
+constexpr bool board_catch_watchdog_resets = true;
 
 constexpr size_t flash_block_size(size_t block_index) { return block_index < 16 ? 4096 : 32768; }
 constexpr size_t flash_addr_to_block(uintptr_t address) {
@@ -174,7 +175,7 @@ int main() {
     Serial0.write("boot: device serial query failed \n");
   }
 
-  if (MCUI::watchdog_has_triggered()) {
+  if (board_catch_watchdog_resets && MCUI::watchdog_has_triggered()) {
     Serial0.write("boot: user code caused watchdog timeout\n");
     Serial0.write("boot: press space to continue\n");
     MCUI::watchdog_clear_timeout_flag();
