@@ -174,6 +174,18 @@ int main() {
     Serial0.write("boot: device serial query failed \n");
   }
 
+  if (MCUI::watchdog_has_triggered()) {
+    Serial0.write("boot: user code caused watchdog timeout\n");
+    Serial0.write("boot: press space to continue\n");
+    MCUI::watchdog_clear_timeout_flag();
+    while(true) {
+      if (Serial0.rx_available()) {
+        Serial0.read(buffer);
+        if (buffer[0] == ' ') break;
+      }
+    }
+  }
+
   FATFS filesystem;
   FIL file;
 
