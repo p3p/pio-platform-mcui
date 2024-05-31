@@ -121,11 +121,11 @@ namespace LPC4078 {
   static_assert(sizeof(UART4Register) == 0x5C);
 
   static constexpr std::array<uintptr_t, 5> uart_address = { 0x4000C000, 0x40010000, 0x40088000, 0x4009C000, 0x400A4000 };
-  static inline const std::array<volatile UARTRegisterBaseExt * const, 5> uart_base = { reinterpret_cast<volatile UARTRegisterBaseExt* const>(uart_address[0]),
-                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt* const>(uart_address[1]),
-                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt* const>(uart_address[2]),
-                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt* const>(uart_address[3]),
-                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt* const>(uart_address[4])
+  static inline const std::array<volatile UARTRegisterBaseExt * const, 5> uart_base = { reinterpret_cast<volatile UARTRegisterBaseExt*>(uart_address[0]),
+                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt*>(uart_address[1]),
+                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt*>(uart_address[2]),
+                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt*>(uart_address[3]),
+                                                                                        reinterpret_cast<volatile UARTRegisterBaseExt*>(uart_address[4])
   };
 
   constexpr auto& uart_lookup_by_id(const size_t uart_id) { return *uart_base[uart_id]; }
@@ -211,7 +211,7 @@ namespace LPC4078 {
   struct baud_rate_divisors {
     uint32_t baud;
     baud_divisors divisors;
-    baud_rate_divisors() : baud{0}, divisors{0} { }
+    baud_rate_divisors() : baud{0}, divisors{} { }
     constexpr baud_rate_divisors(const uint32_t baud) : baud{baud}, divisors{find_divisors(baud)} { }
   };
   constexpr std::array<baud_rate_divisors, 18> baud_divisor_lookup = { 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76800, 115200, 230400, 250000, 460800, 500000, 576000, 921600, 1000000, 2500000 };

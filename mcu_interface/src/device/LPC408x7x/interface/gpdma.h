@@ -48,14 +48,14 @@ constexpr uintptr_t gpdma_channel_address[gpdma_channel_count] = {
 };
 
 static inline volatile GPDMAChannelRegion* const gpdma_channel[gpdma_channel_count] = {
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[0]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[1]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[2]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[3]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[4]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[5]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[6]),
-  reinterpret_cast<volatile GPDMAChannelRegion* const>(gpdma_channel_address[7])
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[0]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[1]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[2]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[3]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[4]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[5]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[6]),
+  reinterpret_cast<volatile GPDMAChannelRegion*>(gpdma_channel_address[7])
 };
 
 };

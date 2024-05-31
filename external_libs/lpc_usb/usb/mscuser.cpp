@@ -65,8 +65,8 @@ uint8_t   BulkBuf[MSC_MAX_PACKET]  __attribute__((section("AHBSRAM0"), aligned(4
 uint32_t  BulkLen;                 /* Bulk In/Out Length */
 Sense sense_data;
 
-MSC_CBW CBW  __attribute__((section("AHBSRAM0"), aligned(4))) = {0};  /* Command Block Wrapper */
-MSC_CSW CSW  __attribute__((section("AHBSRAM0"), aligned(4))) = {0};  /* Command Status Wrapper */
+MSC_CBW CBW  __attribute__((section("AHBSRAM0"), aligned(4))) = {};  /* Command Block Wrapper */
+MSC_CSW CSW  __attribute__((section("AHBSRAM0"), aligned(4))) = {};  /* Command Status Wrapper */
 volatile uint8_t media_lock = 0;
 volatile bool device_wants_lock = false;
 volatile bool ep_in_stalled = false;

@@ -77,7 +77,7 @@ struct SystemControlBlock {
   uint32_t CPACR;         // 0x088, RW, Coprocessor Access Control Register
 };
 static_assert(sizeof(SystemControlBlock) == 0x8C);
-static inline volatile SystemControlBlock* const system_control_block = reinterpret_cast<SystemControlBlock* const>(0xE000ED00);
+static inline volatile SystemControlBlock* const system_control_block = reinterpret_cast<volatile SystemControlBlock*>(0xE000ED00);
 
 struct DataWatchpointTrace {
   uint32_t CTRL;          // 0x000, RW, Control Register
@@ -105,7 +105,7 @@ struct DataWatchpointTrace {
   uint32_t FUNCTION3;     // 0x058, RW, Function Register 3
 };
 static_assert(sizeof(DataWatchpointTrace) == 0x5C);
-static inline volatile DataWatchpointTrace* const data_watchpoint_trace = reinterpret_cast<DataWatchpointTrace* const>(0xE0001000);
+static inline volatile DataWatchpointTrace* const data_watchpoint_trace = reinterpret_cast<volatile DataWatchpointTrace*>(0xE0001000);
 
 struct CoreDebug {
   uint32_t DHCSR;         // 0x000, RW, Debug Halting Control and Status Register
@@ -114,7 +114,7 @@ struct CoreDebug {
   uint32_t DEMCR;         // 0x00C, RW, Debug Exception and Monitor Control Register
 };
 static_assert(sizeof(CoreDebug) == 0x10);
-static inline volatile CoreDebug* const core_debug = reinterpret_cast<CoreDebug* const>(0xE000EDF0UL);
+static inline volatile CoreDebug* const core_debug = reinterpret_cast<volatile CoreDebug*>(0xE000EDF0UL);
 
 struct NestedVectoredInterruptController {
   uint32_t ISER[8];        // 0x000, RW, Interrupt Set Enable Register
@@ -132,7 +132,7 @@ struct NestedVectoredInterruptController {
   uint32_t STIR;           // 0xE00, WO, Software Trigger Interrupt Register
 };
 static_assert(sizeof(NestedVectoredInterruptController) == 0xE04);
-static inline volatile NestedVectoredInterruptController* const nvic = reinterpret_cast<NestedVectoredInterruptController* const>(0xE000E100);
+static inline volatile NestedVectoredInterruptController* const nvic = reinterpret_cast<volatile NestedVectoredInterruptController*>(0xE000E100);
 
 constexpr uint32_t __NVIC_PRIO_BITS = 5;
 [[gnu::always_inline]] static inline void nvic_set_priority(const MCUI::IRQNumber interrupt_number, const uint32_t priority) {

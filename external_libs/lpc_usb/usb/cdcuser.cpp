@@ -81,8 +81,9 @@ void CDC_WrOutBuf() {
     if(CDC_RecvCallback) {
       while (bytesToWrite--) {
         if(CDC_RecvCallback(*buffer)) {
-          if (!LPC4078::usbcdc_buffer.receive_buffer.write(*buffer++))
+          if (!LPC4078::usbcdc_buffer.receive_buffer.write(*buffer++)) {
             _DBG("Overflow\n");
+          }
         }
       }
     } else {
@@ -274,8 +275,8 @@ uint32_t CDC_SendBreak(unsigned short wDurationOfBreak) {
  *---------------------------------------------------------------------------*/
 void CDC_BulkIn(void) {
   uint32_t numBytesAvail = LPC4078::usbcdc_buffer.transmit_buffer.available();
-  if (CDC_InContents != CDC_BUFFER_EMPTY) _DBG("In Buffer busy\n");
-  if (CDC_InContents == CDC_BUFFER_EMPTY) {
+  if (CDC_InContents != CDC_BUFFER_EMPTY) { _DBG("In Buffer busy\n"); }
+  else if (CDC_InContents == CDC_BUFFER_EMPTY) {
     if (numBytesAvail > 0) {
       // We avoid needing to send a zero length packet by never sending a full one
       numBytesAvail = numBytesAvail > (USB_CDC_BUFSIZE - 1) ? (USB_CDC_BUFSIZE - 1) : numBytesAvail;
@@ -351,8 +352,8 @@ void CDC_DMA (uint32_t event) {
       CDC_BulkOut();
       break;
     case USB_EVT_OUT_DMA_NDR:
-      if (CDC_OutContents == CDC_BUFFER_WAITING) _DBG("Out buffer busy\n");
-      if (CDC_OutContents == CDC_BUFFER_EMPTY) {
+      if (CDC_OutContents == CDC_BUFFER_WAITING) { _DBG("Out buffer busy\n"); }
+      else if (CDC_OutContents == CDC_BUFFER_EMPTY) {
         CDC_OutContents = CDC_BUFFER_WAITING;
         CDC_QueueDMAIO(CDC_DEP_OUT, &BulkBufOut[0], USB_CDC_BUFSIZE);
       }

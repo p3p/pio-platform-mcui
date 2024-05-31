@@ -107,6 +107,6 @@ struct USBRegion {
 };
 
 constexpr uintptr_t usb_address = 0x2008C000;
-static inline volatile USBRegion& usb = *reinterpret_cast<volatile USBRegion* const>(usb_address);
+static inline volatile USBRegion& usb = *reinterpret_cast<volatile USBRegion*>(usb_address);
 
 } // namespace LPC4078

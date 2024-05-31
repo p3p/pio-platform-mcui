@@ -33,8 +33,8 @@ static_assert(sizeof(PulseWidthModulation) == 0x074);
 
 static constexpr uint32_t pwm0_hardware_address = 0x40014000;
 static constexpr uint32_t pwm1_hardware_address = 0x40018000;
-static inline PulseWidthModulation* const pwm_device0 = reinterpret_cast<PulseWidthModulation* const>(pwm0_hardware_address);
-static inline PulseWidthModulation* const pwm_device1 = reinterpret_cast<PulseWidthModulation* const>(pwm1_hardware_address);
+static inline volatile PulseWidthModulation* const pwm_device0 = reinterpret_cast<volatile PulseWidthModulation*>(pwm0_hardware_address);
+static inline volatile PulseWidthModulation* const pwm_device1 = reinterpret_cast<volatile PulseWidthModulation*>(pwm1_hardware_address);
 
 void pwm_init(const uint32_t frequency = 50);
 bool pwm_attach_pin(const pin_t pin, const uint32_t value = 0);

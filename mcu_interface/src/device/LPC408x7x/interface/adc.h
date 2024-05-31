@@ -13,17 +13,17 @@ constexpr uint16_t analog_input_count = 8;
 
 struct  adc_control {
   struct adc_register_block {
-    volatile uint32_t control;          // 00
-    volatile uint32_t global_data;      // 04
-    uint32_t unused;                    // 08
-    uint32_t interrupt_enable;          // 0C
-    volatile uint32_t channel_data[8];  // 10,14,18,1C,20,24,28,2C
-    volatile uint32_t status;           // 30
-    uint32_t trim;                      // 34
+    uint32_t control;          // 00
+    uint32_t global_data;      // 04
+    uint32_t unused;           // 08
+    uint32_t interrupt_enable; // 0C
+    uint32_t channel_data[8];  // 10,14,18,1C,20,24,28,2C
+    uint32_t status;           // 30
+    uint32_t trim;             // 34
   };
   static constexpr uint32_t adc_hardware_address = 0x40034000;
-  [[gnu::always_inline]] inline adc_register_block& adc_reg() const {
-    return *reinterpret_cast<adc_register_block*>(adc_hardware_address);
+  [[gnu::always_inline]] inline volatile adc_register_block& adc_reg() const {
+    return *reinterpret_cast<volatile adc_register_block*>(adc_hardware_address);
   }
 
   /**

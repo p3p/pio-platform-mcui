@@ -34,7 +34,7 @@ namespace LPC4078 {
   constexpr uint32_t watchdog_base_address = 0x4000'0000;
   constexpr uint32_t watchdog_base_frequency = 500'000 / 4; // 500K oscillator with fixed 4x divider
 
-  static inline volatile auto& watchdog = *reinterpret_cast<volatile WWDT_register* const>(watchdog_base_address);
+  static inline volatile auto& watchdog = *reinterpret_cast<volatile WWDT_register*>(watchdog_base_address);
 
   [[gnu::always_inline]] inline void watchdog_feed() {
     watchdog.feed = 0xAA & MCUI::util::bitset_build_mask(0, 8);

@@ -33,7 +33,7 @@ class HardwarePWM {
 
   // update the bitset an activate hardware pwm channel for output
   static inline void activate_channel(const pin_t pin) {
-    PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
+    volatile PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
     MCUI::util::bit_set(active_pins, get_pin_id(pin));         // mark the pin as active
     MCUI::util::bit_set(active_channels, (2 * pin_get_hardware_index(pin)) + pin_get_pwm_channel_index(pin));         // mark the channel as active
     MCUI::util::bit_set(device->PCR, 8 + pin_get_pwm_channel(pin));  // turn on the pins PWM output (8 offset + PWM channel)
@@ -42,7 +42,7 @@ class HardwarePWM {
 
   // update the bitset and deactivate the hardware pwm channel
   static inline void deactivate_channel(const pin_t pin) {
-    PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
+    volatile PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
     MCUI::util::bit_clear(active_pins, get_pin_id(pin));      // mark pin as inactive
     MCUI::util::bit_clear(active_channels, (2 * pin_get_hardware_index(pin)) + pin_get_pwm_channel_index(pin));
     if(!channel_active(pin)) MCUI::util::bit_clear(device->PCR, 8 + pin_get_pwm_channel(pin)); // turn off the PWM output
@@ -56,7 +56,7 @@ class HardwarePWM {
 
 public:
   //static void init(const uint32_t prescale, const uint32_t period) {
-  [[gnu::noinline]] static void init(PulseWidthModulation *device, const uint32_t frequency) {
+  [[gnu::noinline]] static void init(volatile PulseWidthModulation *device, const uint32_t frequency) {
     peripheral_power_on(PeripheralPowerControl::PWM0);
     peripheral_power_on(PeripheralPowerControl::PWM1);
 
@@ -97,7 +97,7 @@ public:
   }
 
   static inline void set_period(const pin_t pin, const uint32_t period) {
-    PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
+    volatile PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
     device->TCR = MCUI::util::bit_value(1);
     device->MR0 = period - 1;               // TC resets every period cycles (0 counts so remove 1)
     device->LER = MCUI::util::bitset_value(0);    // Set Latch on MR0
@@ -105,7 +105,7 @@ public:
   }
 
   static inline uint32_t get_period(const pin_t pin) {
-    PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
+    volatile PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
     return device->MR0 + 1; // Add 1 to reflect 0 count.
   }
 
@@ -116,7 +116,7 @@ public:
   // update the match register for a channel and set the latch to update on next period
   static inline void set_match(const pin_t pin, const uint32_t value) {
     if (!pin_has_pwm(pin)) return;
-    PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
+    volatile PulseWidthModulation *device = pin_get_hardware_index(pin) == 0 ? pwm_device0 : pwm_device1;
     *match_register_ptr(pin) = value == device->MR0 ? value + 1 : value; // work around for bug if MRn == MR0
     device->LER |= MCUI::util::bit_value(pin_get_pwm_channel(pin));                    // Enable Latch for MRn channel
   }

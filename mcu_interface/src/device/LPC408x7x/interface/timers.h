@@ -25,9 +25,9 @@ struct TimerRegion {
 };
 static_assert(sizeof(TimerRegion) == 0x074);
 
-static auto& timer0 = *reinterpret_cast<volatile TimerRegion* const>(0x40004000);
-static auto& timer1 = *reinterpret_cast<volatile TimerRegion* const>(0x40008000);
-static auto& timer2 = *reinterpret_cast<volatile TimerRegion* const>(0x40090000);
-static auto& timer3 = *reinterpret_cast<volatile TimerRegion* const>(0x40094000);
+static auto& timer0 = *reinterpret_cast<volatile TimerRegion*>(0x40004000);
+static auto& timer1 = *reinterpret_cast<volatile TimerRegion*>(0x40008000);
+static auto& timer2 = *reinterpret_cast<volatile TimerRegion*>(0x40090000);
+static auto& timer3 = *reinterpret_cast<volatile TimerRegion*>(0x40094000);
 
 }

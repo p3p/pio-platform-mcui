@@ -15,7 +15,7 @@ struct SysTick {
   uint32_t CALIB;    // 0x00C, RO, SysTick Calibration Register
 };
 static_assert(sizeof(SysTick) == 0x10);
-static inline volatile SysTick* const sys_tick = reinterpret_cast<SysTick* const>(0xE000E010);
+static inline volatile SysTick* const sys_tick = reinterpret_cast<volatile SysTick*>(0xE000E010);
 
 [[gnu::always_inline]] static inline uint32_t sys_tick_configure(const uint32_t ticks) {
   constexpr uint32_t SysTick_LOAD_RELOAD_Msk = 0xFFFFFFUL << 0;

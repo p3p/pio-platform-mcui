@@ -29,11 +29,11 @@ namespace LPC4078 {
   if (__builtin_constant_p(x)) {
     constexpr uint32_t MAXNOPS = 16;
     if (x <= (MAXNOPS)) {
-      switch (x) { case 16: nop(); case 15: nop(); case 14: nop(); case 13: nop(); case 12: nop(); case 11: nop(); case 10: nop(); case  9: nop();
-                    case  8: nop(); case  7: nop(); case  6: nop(); case  5: nop(); case  4: nop(); case  3: nop(); case  2: nop(); case  1: nop(); }
+      switch (x) { case 16: nop(); [[fallthrough]]; case 15: nop(); [[fallthrough]]; case 14: nop(); [[fallthrough]]; case 13: nop(); [[fallthrough]]; case 12: nop(); [[fallthrough]]; case 11: nop(); [[fallthrough]]; case 10: nop(); [[fallthrough]]; case  9: nop(); [[fallthrough]];
+                   case  8: nop(); [[fallthrough]]; case  7: nop(); [[fallthrough]]; case  6: nop(); [[fallthrough]]; case  5: nop(); [[fallthrough]]; case  4: nop(); [[fallthrough]]; case  3: nop(); [[fallthrough]]; case  2: nop(); [[fallthrough]]; case  1: nop(); }
     } else { // because of +1 cycle inside delay_4cycles
       const uint32_t rem = (x - 1) % 4;
-      switch (rem) { case 3: nop(); case 2: nop(); case 1: nop(); }
+      switch (rem) { case 3: nop(); [[fallthrough]]; case 2: nop(); [[fallthrough]]; case 1: nop(); }
       if ((x = (x - 1) / 4))
         __delay_4cycles(x);
     }

@@ -28,9 +28,9 @@ static_assert(sizeof(I2CRegion) == 0x040);
 constexpr size_t i2c_device_count = 3;
 constexpr uintptr_t i2c_device_address[i2c_device_count] = { 0x4001C000, 0x4005C000, 0x400A0000 };
 static inline volatile I2CRegion* const i2c_device[i2c_device_count] = {
-  reinterpret_cast<volatile I2CRegion* const>(i2c_device_address[0]),
-  reinterpret_cast<volatile I2CRegion* const>(i2c_device_address[1]),
-  reinterpret_cast<volatile I2CRegion* const>(i2c_device_address[2])
+  reinterpret_cast<volatile I2CRegion*>(i2c_device_address[0]),
+  reinterpret_cast<volatile I2CRegion*>(i2c_device_address[1]),
+  reinterpret_cast<volatile I2CRegion*>(i2c_device_address[2])
 };
 
 } // namespace LPC4078

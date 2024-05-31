@@ -109,7 +109,7 @@ struct SystemControlRegion {
 };
 static_assert(sizeof(SystemControlRegion) == 0x1E4);
 constexpr uint32_t system_control_region_base = 0x400FC000;
-static inline volatile auto& system_control = *reinterpret_cast<volatile SystemControlRegion* const>(system_control_region_base);
+static inline volatile auto& system_control = *reinterpret_cast<volatile SystemControlRegion*>(system_control_region_base);
 
 constexpr uint32_t zero_safe_divide(const uint32_t x, const uint32_t y) { return y == 0 ? 0: x / y; }
 

@@ -92,9 +92,9 @@ static_assert(sizeof(SSPRegion) == 0x28);
 constexpr size_t ssp_device_count = 3;
 constexpr uintptr_t ssp_address[ssp_device_count] = { 0x40088000, 0x40030000, 0x400AC000 };
 static inline volatile SSPRegion* const ssp_device[ssp_device_count] = {
-  reinterpret_cast<volatile SSPRegion* const>(ssp_address[0]),
-  reinterpret_cast<volatile SSPRegion* const>(ssp_address[1]),
-  reinterpret_cast<volatile SSPRegion* const>(ssp_address[2])
+  reinterpret_cast<volatile SSPRegion*>(ssp_address[0]),
+  reinterpret_cast<volatile SSPRegion*>(ssp_address[1]),
+  reinterpret_cast<volatile SSPRegion*>(ssp_address[2])
 };
 constexpr PeripheralPowerControl ssp_power_control_lookup[ssp_device_count] = {
   PeripheralPowerControl::SSP0,
@@ -225,7 +225,7 @@ static constexpr FrequencyDescriptor find_divisors(const size_t frequency) {
   return PeripheralClock / (ssp.CPSR.CPSDVSR * (ssp.CR0.SCR + 1));
 }
 
-[[gnu::always_inline]] static inline void frequency(const size_t ssp_id, size_t freq) {
+[[gnu::always_inline]] static inline void frequency(const size_t ssp_id, const size_t freq) {
   auto& ssp = *ssp_device[ssp_id];
   auto divisors = find_divisors(freq);
   ssp.CPSR.CPSDVSR = divisors.base_divisor;
