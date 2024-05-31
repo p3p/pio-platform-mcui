@@ -232,7 +232,8 @@ struct pin_type {
   }
 
   [[gnu::always_inline, nodiscard]] constexpr pin_t index() const {
-    if(is_valid()) return (gpio_reg_id << 5) | gpio_reg_bit;
+    const auto maybe_pin = (gpio_reg_id << 5) | gpio_reg_bit;
+    if(pin_info_lookup::is_valid(maybe_pin)) return maybe_pin;
     return -1;
   }
 
