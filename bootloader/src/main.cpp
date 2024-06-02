@@ -33,6 +33,35 @@ constexpr size_t flash_addr_to_block(uintptr_t address) {
 
 MCUI::RawUARTC Serial0(0);
 
+template <typename T> struct as_hex {
+  as_hex(T v) : value(v) {};
+  T value;
+};
+
+char buffer[32];
+template <typename V> [[gnu::always_inline]] inline void serial_print(as_hex<V> value) {
+  auto res = std::to_chars(std::begin(buffer), std::end(buffer), value.value, 16);
+  for (int i = res.ptr - buffer; i < ((int)sizeof(V) * 2); ++i) Serial0.write("0");
+  Serial0.write(buffer, res.ptr - buffer);
+}
+
+template <typename V> [[gnu::always_inline]] inline void serial_print(V value) {
+  auto res = std::to_chars(std::begin(buffer), std::end(buffer), value);
+  Serial0.write(buffer, res.ptr - buffer);
+}
+
+template <typename T, size_t N> [[gnu::always_inline]] inline void serial_print(T (&str)[N]){
+  Serial0.write(str, N - 1);
+}
+
+[[gnu::always_inline]] inline void serial_print(const char* c_str){
+  Serial0.write(c_str);
+}
+
+template<typename... Args> [[gnu::always_inline]] inline void serial_print(Args&&... args) {
+  ((serial_print(std::forward<Args>(args))),...);
+}
+
 [[noreturn]] void boot() {
   typedef void __attribute__((noreturn))(*user_reset_handler)();
   MCUCore::nvic_interrupts_disable();
@@ -42,53 +71,31 @@ MCUI::RawUARTC Serial0(0);
   MCUCore::DMB();
   MCUCore::DSB();
   MCUCore::ISB();
-  Serial0.write("boot: jumping to usercode\n");
+  serial_print("boot: jumping to usercode\n");
   MCUCore::MSP(*(uint32_t *)user_flash_start);
   (*(user_reset_handler*)(user_flash_start + 4))();
 }
 
 bool flash(FIL& file) {
-  char buffer[10];
-
   auto binary_size = f_size(&file);
-  Serial0.write("boot: firmware size: ");
-  auto res = std::to_chars(std::begin(buffer), std::end(buffer), binary_size);
-  Serial0.write(buffer, res.ptr - buffer);
-  Serial0.write("B\n");
-
-  Serial0.write("boot: flashing to 0x");
-  res = std::to_chars(std::begin(buffer), std::end(buffer), user_flash_start, 16);
-  Serial0.write(buffer, res.ptr - buffer);
-  Serial0.write("\n");
+  serial_print("boot: firmware size: ", binary_size, "B\n");
+  serial_print("boot: flashing to 0x", as_hex(user_flash_start), "\n");
 
   size_t start_sector = flash_addr_to_block(user_flash_start);
   size_t end_sector = flash_addr_to_block(user_flash_start + binary_size);
 
   auto iap_res = MCUI::IAP::execute(MCUI::IAP::CommandID::PrepareSectorForWrite, start_sector, end_sector);
   if (iap_res.status != MCUI::IAP::StatusCode::Success) {
-    Serial0.write("boot: IAP::PrepareSectorForWrite failed, error code: ");
-    res = std::to_chars(std::begin(buffer), std::end(buffer), MCUI::util::to_integral(iap_res.status));
-    Serial0.write(buffer, res.ptr - buffer);
-    Serial0.write("\n");
+    serial_print("boot: IAP::PrepareSectorForWrite failed, error code: ", MCUI::util::to_integral(iap_res.status), "\n");
     return false;
   }
 
   iap_res = MCUI::IAP::execute(MCUI::IAP::CommandID::EraseSector, start_sector, end_sector, MCUI::system_clock() / 1000);
   if (iap_res.status != MCUI::IAP::StatusCode::Success) {
-    Serial0.write("boot: IAP::EraseSector failed, error code: ");
-    res = std::to_chars(std::begin(buffer), std::end(buffer), MCUI::util::to_integral(iap_res.status));
-    Serial0.write(buffer, res.ptr - buffer);
-    Serial0.write("\n");
+    serial_print("boot: IAP::EraseSector failed, error code: ", MCUI::util::to_integral(iap_res.status), "\n");
     return false;
   }
-
-  Serial0.write("boot: sector range (");
-  res = std::to_chars(std::begin(buffer), std::end(buffer), start_sector);
-  Serial0.write(buffer, res.ptr - buffer);
-  Serial0.write(" - ");
-  res = std::to_chars(std::begin(buffer), std::end(buffer), end_sector);
-  Serial0.write(buffer, res.ptr - buffer);
-  Serial0.write(") erased\n");
+  serial_print("boot: sector range (", start_sector, " - ", end_sector, ") erased\n");
 
   char chunk_buffer[512];
   UINT bytes_read = 0;
@@ -99,25 +106,20 @@ bool flash(FIL& file) {
     size_t sector = flash_addr_to_block(flash_offset);
     iap_res = MCUI::IAP::execute(MCUI::IAP::CommandID::PrepareSectorForWrite, sector, sector);
     if (iap_res.status != MCUI::IAP::StatusCode::Success) {
-      Serial0.write("boot: IAP::PrepareSectorForWrite failed, error code: ");
-      res = std::to_chars(std::begin(buffer), std::end(buffer), MCUI::util::to_integral(iap_res.status));
-      Serial0.write(buffer, res.ptr - buffer);
-      Serial0.write("\n");
+      serial_print("boot: IAP::PrepareSectorForWrite failed, error code: ", MCUI::util::to_integral(iap_res.status), "\n");
       return false;
     }
 
     iap_res = MCUI::IAP::execute(MCUI::IAP::CommandID::CopyRAMtoFLASH, flash_offset, (uint32_t)chunk_buffer, 512UL, MCUI::system_clock() / 1000);
     if (iap_res.status != MCUI::IAP::StatusCode::Success) {
-      Serial0.write("boot: IAP::CopyRAMtoFLASH failed, error code: ");
-      res = std::to_chars(std::begin(buffer), std::end(buffer), MCUI::util::to_integral(iap_res.status));
-      Serial0.write(buffer, res.ptr - buffer);
-      Serial0.write("\n");
+      serial_print("boot: IAP::CopyRAMtoFLASH failed, error code: ", MCUI::util::to_integral(iap_res.status), "\n");
       return false;
     }
+
     flash_offset += bytes_read;
     MCUI::gpio_set(board_status_led, flash_offset & 0x8000 );
   }
-  Serial0.write("boot: flash write sequence complete\n");
+  serial_print("boot: flash write sequence complete\n");
 
   f_rewind(&file);
   flash_offset = user_flash_start;
@@ -125,19 +127,13 @@ bool flash(FIL& file) {
     f_read(&file, chunk_buffer, 512, &bytes_read);
     iap_res = MCUI::IAP::execute(MCUI::IAP::CommandID::Compare, flash_offset, (uint32_t)chunk_buffer, 512UL);
     if (iap_res.status != MCUI::IAP::StatusCode::Success) {
-      Serial0.write("boot: IAP::Compare failed, error code: ");
-      res = std::to_chars(std::begin(buffer), std::end(buffer), MCUI::util::to_integral(iap_res.status));
-      Serial0.write(buffer, res.ptr - buffer);
-      Serial0.write("\n");
-      Serial0.write("boot: write validation failed @ 0x");
-      res = std::to_chars(std::begin(buffer), std::end(buffer), flash_offset + iap_res.value[0], 16);
-      Serial0.write(buffer, res.ptr - buffer);
-      Serial0.write("\n");
+      serial_print("boot: IAP::Compare failed, error code: ", MCUI::util::to_integral(iap_res.status), "\n");
+      serial_print("boot: write validation failed @ 0x", as_hex(flash_offset + iap_res.value[0]), "\n");
       return false;
     }
     flash_offset += bytes_read;
   }
-  Serial0.write("boot: flash validation complete\n");
+  serial_print("boot: flash validation complete\n");
 
   return true;
 }
@@ -153,36 +149,26 @@ int main() {
 
   Serial0.configure_pins(board_uart_rx, board_uart_tx);
   Serial0.init({ .baud = board_uart_baud });
-  Serial0.write("boot: bootloader started\n");
 
-  auto part_id = MCUI::IAP::device_part_id();
-  Serial0.write("boot: device part id [");
-  Serial0.write(part_id.name);
-  Serial0.write("]\n");
+  serial_print("boot: bootloader started\n");
+  serial_print("boot: device part id [", MCUI::IAP::device_part_id().name, "]\n");
 
-  char buffer[16];
   auto serial_number = MCUI::IAP::device_serial_number();
   if (serial_number.status == MCUI::IAP::StatusCode::Success) {
-    Serial0.write("boot: device serial [");
-    char buffer[16];
-    std::to_chars(std::begin(buffer), std::end(buffer), serial_number.value[0], 16);
-    std::to_chars(std::begin(buffer) + 4, std::end(buffer), serial_number.value[1], 16);
-    std::to_chars(std::begin(buffer) + 8, std::end(buffer), serial_number.value[2], 16);
-    std::to_chars(std::begin(buffer) + 12, std::end(buffer), serial_number.value[3], 16);
-    Serial0.write(buffer, 16);
-    Serial0.write("]\n");
+    serial_print("boot: device serial [", as_hex(serial_number.value[0]), as_hex(serial_number.value[1]), as_hex(serial_number.value[2]), as_hex(serial_number.value[3]), "]\n");
   } else {
-    Serial0.write("boot: device serial query failed \n");
+    serial_print("boot: device serial query failed \n");
   }
 
   if (board_catch_watchdog_resets && MCUI::watchdog_has_triggered()) {
-    Serial0.write("boot: user code caused watchdog timeout\n");
-    Serial0.write("boot: press space to continue\n");
+    serial_print("boot: user code caused watchdog timeout\n");
+    serial_print("boot: press space to continue\n");
     MCUI::watchdog_clear_timeout_flag();
+    char rx_buffer[16];
     while(true) {
       if (Serial0.rx_available()) {
-        Serial0.read(buffer);
-        if (buffer[0] == ' ') break;
+        Serial0.read(rx_buffer);
+        if (rx_buffer[0] == ' ') break;
       }
     }
   }
@@ -193,25 +179,20 @@ int main() {
   f_mount(&filesystem, "", 0);
   FRESULT fr = f_open(&file, board_firmware_bin, FA_READ);
   if (fr == FR_OK) {
-    Serial0.write("boot: new firmware binary found\n");
+    serial_print("boot: new firmware binary found\n");
     bool flashed = flash(file);
     fr = f_close(&file);
     if (flashed) {
       f_unlink(board_firmware_cur);
       f_rename(board_firmware_bin, board_firmware_cur);
-      Serial0.write("boot: flash complete, firmware binary backed up to ");
-      Serial0.write(board_firmware_cur);
-      Serial0.write("\n");
+      serial_print("boot: flash complete, firmware binary backed up to ", board_firmware_cur, "\n");
     }
   } else if (fr == FR_NOT_READY) {
-    Serial0.write("boot: no sd card\n");
+    serial_print("boot: no sd card\n");
   } else if (fr == FR_NO_FILE) {
-    Serial0.write("boot: no new firmware\n");
+    serial_print("boot: no new firmware\n");
   } else {
-    Serial0.write("boot: error checking sdcard (error code: ");
-    auto res = std::to_chars(std::begin(buffer), std::end(buffer), fr);
-    Serial0.write(buffer, res.ptr - buffer);
-    Serial0.write(")\n");
+    serial_print("boot: error checking sdcard (error code: ", fr, ")\n");
   }
   f_unmount("");
 
