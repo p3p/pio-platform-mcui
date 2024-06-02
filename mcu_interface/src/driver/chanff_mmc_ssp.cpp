@@ -15,20 +15,29 @@
 
 #define SSP_CH	1	// SSP channel to use (0:SSP0, 1:SSP1)
 
-
 auto& ssp = *MCUI::ssp_device[SSP_CH];
 
-#define SCLK_FAST	10000000UL	// SCLK frequency under normal operation [Hz]
-#define	SCLK_SLOW	400000UL	  // SCLK frequency under initialization [Hz]
+#define SCLK_FAST 15000000UL // SCLK frequency under normal operation [Hz]
+#define SCLK_SLOW 400000UL   // SCLK frequency under initialization [Hz]
 
-#define	MMC_CD		(1)	// Card detect
-#define	MMC_WP		0		// Write protected
+#define MMC_CD (1) // Card detect
+#define MMC_WP 0   // Write protected
 
-void FCLK_FAST() { MCUI::SSP::frequency(SSP_CH, SCLK_FAST); }
-void FCLK_SLOW() { MCUI::SSP::frequency(SSP_CH, SCLK_SLOW); }
+[[gnu::always_inline]] inline void FCLK_FAST() {
+  MCUI::SSP::frequency(SSP_CH, SCLK_FAST);
+}
 
-void CS_HIGH() { MCUI::gpio_set(P0_06); }
-void CS_LOW() { MCUI::gpio_clear(P0_06); }
+[[gnu::always_inline]] inline void FCLK_SLOW() {
+  MCUI::SSP::frequency(SSP_CH, SCLK_SLOW);
+}
+
+[[gnu::always_inline]] inline void CS_HIGH() {
+  MCUI::gpio_set(P0_06);
+}
+
+[[gnu::always_inline]] inline void CS_LOW() {
+  MCUI::gpio_clear(P0_06);
+}
 
 /*--------------------------------------------------------------------------
 
@@ -209,14 +218,10 @@ void power_on() {
 
   MCUI::SSP::init(
       SSP_CH,
-      { .frequency = 10000000,
+      { .frequency = SCLK_SLOW,
         .mode      = 0,
         .format    = MCUI::SSP::Config::Format::SPI,
         .data_bits = 8,
-        // .pin_sck   = P1_00,
-        // .pin_ssel  = P_NC,
-        // .pin_miso  = P1_04,
-        // .pin_mosi  = P1_01 }
         .pin_sck   = P0_07,
         .pin_ssel  = P_NC,
         .pin_miso  = P0_08,
@@ -225,6 +230,7 @@ void power_on() {
 	MCUI::gpio_set(P0_06);
   MCUI::delay_ms(10);
 }
+
 void power_off() { select(); deselect(); }
 
 
