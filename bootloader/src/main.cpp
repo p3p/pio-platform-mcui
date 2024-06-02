@@ -154,11 +154,7 @@ int main() {
   serial_print("boot: device part id [", MCUI::IAP::device_part_id().name, "]\n");
 
   auto serial_number = MCUI::IAP::device_serial_number();
-  if (serial_number.status == MCUI::IAP::StatusCode::Success) {
-    serial_print("boot: device serial [", as_hex(serial_number.value[0]), as_hex(serial_number.value[1]), as_hex(serial_number.value[2]), as_hex(serial_number.value[3]), "]\n");
-  } else {
-    serial_print("boot: device serial query failed \n");
-  }
+  serial_print("boot: device serial [", as_hex(serial_number.value[0]), as_hex(serial_number.value[1]), as_hex(serial_number.value[2]), as_hex(serial_number.value[3]), "]\n");
 
   if (board_catch_watchdog_resets && MCUI::watchdog_has_triggered()) {
     serial_print("boot: user code caused watchdog timeout\n");

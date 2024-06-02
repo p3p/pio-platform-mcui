@@ -51,12 +51,12 @@ struct IAP {
 
   struct Command {
     CommandID command {CommandID::Invalid};
-    uint32_t args[4] {0, 0, 0, 0};
+    uint32_t args[4] {};
   };
 
   struct CommandResult {
     StatusCode status {StatusCode::Invalid};
-    uint32_t value[4] {0, 0, 0, 0};
+    uint32_t value[4] {};
   };
 
   static inline void call(Command&& command, CommandResult& output) {
@@ -82,8 +82,13 @@ struct IAP {
     return { iap_part_id_lookup(res.value[0]), res.value[0] };
   }
 
-  static inline CommandResult device_serial_number() {
-    return execute(CommandID::ReadSerialNumber);
+  struct DeviceSerial {
+    uint32_t value[4] {};
+  };
+
+  static inline DeviceSerial device_serial_number() {
+    auto res = execute(CommandID::ReadSerialNumber);
+    return {res.value[0], res.value[1], res.value[2], res.value[3]};
   }
 
 };
